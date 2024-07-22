@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserMapper">
+	<resultMap type="com.a.ezn.UserVO" id="UserMap">
+		<!-- property ->VO, coulumn ->개체 -->
+		<id property="email" column="email"/>
+		<result property="password" column="password"></result>
+		<result property="nick_name" column="nick_name"></result>
+		<result property="phone_number" column="phone_number"></result>
+		<result property="agreed_personal" column="agreed_personal"></result>
+		<result property="profile_image" column="profile_image"></result>
+		<result property="userType" column="user_type"></result>
+		<result property="ben_count" column="ben_count"></result>
+		<result property="self_introduction" column="self_introduction"></result>
+		<result property="create_date" column="create_date"></result>
+		<result property="delete_date" column="delete_date"></result>
+	</resultMap>
+	
+	<insert id="insert" parameterType="com.a.ezn.UserVO">
+		insert into user(email, password, gender, nick_name, phone_number, agreed_personal,user_type, ben_count,create_date) values(#{email}, #{password}, 1, '이젠','1234567', true, 0, 0, now());
+	</insert>
+	
+	<select id="idCheck" parameterType="String" resultType="Integer">
+		select count(*) from user where email = #{email};
+	</select>
+
+	<select id="login" parameterType="com.a.ezn.UserVO" resultMap="UserMap">
+		select email, user_type from user where email = #{email} and password = #{password}; 
+	</select>
+</mapper>

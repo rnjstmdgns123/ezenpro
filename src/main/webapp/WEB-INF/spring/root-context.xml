@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- 스프링의 ContextLoaderListener가 동작할 때 아래의 xml 태그 안에 있는
+	클래스들의 생성자를 전부 호출하고, IOC컨테이너 안에 등록한다(저장한다).
+	단, bean이라고 작성된 태그만 읽어서 생성자를 호출한다. -->
+	
+	<!-- DriverManagerDataSource datasource = new DriverManagerDataSource();
+		bean 태그에 id가 존재한다면 생성자를 호출할 때 해당하는 id의 이름으로 변수가 선언된다.
+		id속성이 존재하지 않는다면, 생성자를 담는 변수의 이름이 클래스 이름과 동일하게 선언된다.
+	-->
+	<bean id="datasource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<!-- property는 해당 클래스가 가지고 있는 setter메서드를 의미한다.
+			name속성에는 setter메서드의 이름이 들어가고, value에는 setter 메서드의
+			파라미터에 들어갈 값을 넣는다.
+			datasource.setDriverClassName("com.mysql.cj.jdbc.Driver");
+		 -->
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+		<!-- datasource.setUrl("jdbc:mysql://localhost:3306/sample"); -->
+		<property name="url" value="jdbc:mysql://localhost:3306/sample"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="ezen"></property>
+	</bean>
+	
+	<!-- core.JdbcTemplate jdbcTemplate = new JdbcTemplate(); -->
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+	  <!-- jdbcTemplate.setDatasource(); 
+	  	property 태그에 ref속성이 있다면, setter메서드의 파라미터로
+	  	ref(references)로 참조한 특정 클래스의 생성자 메모리 주소가 들어간다는 의미이다.
+	  -->
+      <property name="dataSource" ref="datasource"></property>
+   	</bean>
+	
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="datasource"></property>
+		<!-- mybatis 설정  파일의 경로를 setConfigLocation() 메서드의 파라미터로 넣는다.
+			class 경로 아래에 존재하는 mybatis-config.xml 파일을 찾는다.-->
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+		<!-- 실제쿼리를 xml 파일로 옮겨놓음 
+			setMapperLocation()의 파라미터로 sql 쿼리가 작성되어있는 xml파일들의 경로를 넣는다.
+			class 경로 아래에 존재하는 mappers폴더 안의 .xml 확장자를 가진 모든 파일을 찾는다. -->
+		<property name="mapperLocations" value="classpath:mappers/*.xml"></property>
+	</bean>
+	
+	<!-- 
+	<bean class="org.mybatis.spring.SqlSessionTemplate">
+		 constructor-arg는 bean에 정의된 클래스가 생성될 때 호출하는 생성자의
+		파라미터로 들어가는 값을 정의한다.
+		SqlSessionTemplate sqlSessionTemplate new SqlSessionTemplate(sqlSessionFactory); 
+		 -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactory"></constructor-arg>
+	</bean>
+</beans>
+

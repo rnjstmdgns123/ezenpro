@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="TitleMapper">
+	<resultMap type="com.a.ezn.TodoTitleVO" id="titleMap">
+		<id property="todo_title_id" column="todo_title_id"/>
+		<result property="color_id" column="color_id"></result>
+		<result property="email" column="email"></result>
+		<result property="todo_title" column="todo_title"></result>
+		<result property="title_todo_open" column="title_todo_open"></result>
+		<result property="title_color" column="title_color"></result>	
+	</resultMap>
+	
+	<select id="getAll" resultMap="TitleMapper">
+		select * from todo_title;
+	</select>
+	
+	
+	
+	
+
+
+</mapper>
+
+
+
+
+
+
+

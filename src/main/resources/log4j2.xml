@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %5p [%c] %m%n" />
+        </Console>
+<!-- 
+        <File name="file" fileName="./logs/file/sample.log" append="false">
+            <PatternLayout pattern="%d %5p [%c] %m%n"/>
+            <PatternLayout pattern="%d %5p [%c] [%X{class} %X{method} %X{testKey}] %m%n" />
+        </File>
+--> 
+<!-- 
+        <RollingFile name="rollingFile" fileName="./logs/rolling/dailyRollingSample.log" filePattern="./logs/daily/dailyRollingSample.log.%d{yyyy-MM-dd-HH-mm-ss}">
+ -->        
+        <RollingFile name="rollingFile" fileName="./logs/rolling/dailyRollingSample.log" filePattern="./logs/daily/dailyRollingSample.log.%d{yyyy-MM-dd}">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} %5p [%c] %m%n" />
+            <!-- <PatternLayout pattern="%d %5p [%c] [%X{class} %X{method} %X{testKey}] %m%n" /> -->
+            <Policies>
+                <!-- interval(default 1)이므로 1초 간격으로 rolling 수행 --> 
+                <TimeBasedTriggeringPolicy />
+            </Policies>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="java.sql" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="egovframework" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile" />
+        </Logger>
+          <!-- log SQL with timing information, post execution -->
+        <Logger name="jdbc.sqltiming" level="DEBUG" additivity="false">
+            <AppenderRef ref="console" />
+        </Logger>
+        <Logger name="org.springframework" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile" />
+        </Logger>
+        <Logger name="a" level="INFO" additivity="false">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile" />
+        </Logger>
+        <Root level="INFO">
+            <AppenderRef ref="console" />
+            <AppenderRef ref="rollingFile" />
+        </Root>
+    </Loggers>
+</Configuration>

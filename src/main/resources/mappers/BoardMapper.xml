@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BoardMapper">
+	<!--  
+		resultMap은 자바 클래스와, 데이터베이스 테이블의 필드(컬럼)과 1:1로 매핑해주는 역할을 
+		수행한다. type속성에 매핑될 자바 클래스를 입력하고, id 속성에 고유 이름을 입력한다.
+	-->
+	<resultMap type="com.a.ezn.BoardVO" id="boardMap">
+		<!-- property ->VO, coulumn ->개체 -->
+		<!-- id 태그는 테이블의 PK에 해당한다.
+			property 속성은 resultMap의 Type 속성에 입력된 클래스가 가지고있는 필드이다.
+			column 속성은 테이블이 가지고있는 필드(컬럼) 이름이다.
+			테이블에 sno라는 pk 필드를 조회할 때, BoardVO 클래스의 sno 필드에 넣어준다는 것.
+		 -->
+		<id property="sno" column="sno"/>
+		<result property="title" column="title"></result>
+		<result property="body" column="body"></result>
+		<result property="writer" column="writer"></result>
+		<result property="rdate" column="rdate"></result>
+		<!-- collection 태그는 BoardVO클래스가 가지고 있는 필드 중에
+			ListM<?> 타입으로 선언한 필드를 테이블의 필드와 1:1로 매핑한다.
+			BoardVO 클래스에 존재하는 필드중에 files 필드가 ofType속성에 입력된
+			클래스 타입의 List라는 것을 의미한다.
+			List<FileVO> files
+		 -->
+		<collection property="files" ofType="com.a.ezn.FileVO">
+			<!-- property속성은 ofType 속성에 입력된 클래스의 필드를 의미한다.
+				fileVO 클래스의 fileNo 필드라는 의미.
+				테이블의 file_no 필드의 값을 FileVO 클래스의 fileNO필드에 넣어준다.
+			 -->
+			<id property="fileNo" column="file_no"/>
+			<result property="sno" column="sno"/>
+			<result property="filePath" column="file_path"></result>
+			<result property="fileName" column="file_name"></result>
+			<result property="fileSize" column="file_size"></result>
+			<result property="fileType" column="file_type"></result>
+		</collection>
+	</resultMap>
+	
+	<select id="getAll" resultMap="boardMap">
+		select * from sampleTB
+		<where>
+			<if test="searchType != null and searchType != '' and keyword != null and keyword != ''">
+				and ${searchType} like concat('%', #{keyword}, '%')
+			</if>
+		</where>
+		limit #{offset}, #{limit};
+	</select>
+	
+	<select id="count" resultType="int">
+		select count(*) from sampleTB
+		<where>
+			<if test="searchType != null and searchType != '' and keyword != null and keyword != ''">
+				and ${searchType} like concat('%', #{keyword}, '%')
+			</if>
+		</where>	
+	</select>
+	
+	<!-- resultMap은 아래 sql 쿼리를 실행하고 반환 될 자바 클래스 타입을 정의한다. -->
+	
+	<select id="findById" parameterType="int" resultMap="boardMap">
+		select * from sampleTB left join file on sampleTB.sno = file.sno where sampleTB.sno = #{sno};
+	</select> 
+	
+	<!-- 실제 sql 쿼리가 실행될 타입에 따라 다른 xml 태그를 사용한다.
+		insert쿼리의 경우 <insert>태그를 사용하고
+		select쿼리의 경우 <select>태그를 사용한다.
+		id 속성은 xml의 고유 값이어야 한다.(중복 되면 안됨)
+		parameterType 속성은 쿼리를 실행하기 위해 repository에서 넘겨준 파라미터 타입을 넣어준다.
+		parameterType에 들어갈 수 있는 값은, 클래스나 자바의 기본타입만 들어갈 수 있다.
+		useGeneratedKeys 속성이 true라면 아래 쿼리를 실행할 때, 
+		테이블의 pk 가 auto_increment 제약조건이 있어야만 하고 조건이 충족된다면  증가된 pk의 값을
+		파라미터로 받은 BoardVO 클래스의 sno 필드에 값으로 넣어준다.
+		sno 필드인 이유는 keyProperty 속성에 작성된 필드로 넣어주기 떄문 
+		xml 태그 안에서는 parameterType으로 넘어온 클래스의 필드에 EL 문법으로 접근이 가능하다. 
+		#{클래스필드}는 클래스 필드의 타입에 따라서 문자열이면 홑따음표(')가 붙고, 정수형 이라면 붙지 않는다.
+		${클래스필드}는 홑따음표가 붙지 않는다. -->
+	
+	<insert id="insert" parameterType="com.a.ezn.BoardVO" useGeneratedKeys="true" keyProperty="sno">
+		insert into sampleTB(title, body, writer, rdate)
+		values(#{title}, #{body}, #{writer}, now());
+	</insert>
+	
+	<update id="update" parameterType="com.a.ezn.BoardVO" >
+		update sampleTB set title = #{title}, body = #{body}, writer = #{writer} where sno = #{sno};
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		delete from sampleTB where sno = #{sno};
+	</delete>
+	
+	
+</mapper>
